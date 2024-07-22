@@ -2,4 +2,4 @@
 
 ## Screenshots
 
-<img src="./screenshots/Screenshot_1721667986.png">
+<img src="./screenshots/Screenshot_1721667986.png" height=400>
