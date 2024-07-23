@@ -14,8 +14,6 @@ class ItemService extends ChangeNotifier {
   List<Item> get items => _items;
 
   void addItem(String value) {
-    if (value.isEmpty) return;
-
     Item item = _itemModel.create(value);
     _items.add(item);
     notifyListeners();

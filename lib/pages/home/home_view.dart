@@ -34,12 +34,13 @@ class _HomePageState extends State<HomePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    itemService = Provider.of<ItemService>(context, listen: false);
+    itemService = Provider.of<ItemService>(context);
   }
 
   void _addItem() {
-    itemService.addItem(_addItemInputController.text);
+    if (_addItemInputController.text.isEmpty) return;
 
+    itemService.addItem(_addItemInputController.text);
     _addItemInputController.clear();
     _listKey.currentState!.insertItem(itemService.items.length - 1);
   }
