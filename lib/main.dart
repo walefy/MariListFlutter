@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:realm/realm.dart';
-import 'package:todo_list_app/entities/item.dart';
-import 'package:todo_list_app/models/item_model.dart';
-import 'package:todo_list_app/pages/home/home_view.dart';
-import 'package:todo_list_app/pages/widgets/app_widget.dart';
-import 'package:todo_list_app/services/item_service.dart';
+import 'package:provider/provider.dart';
+import 'package:todo_list_app/config/config_helper.dart';
+import 'package:todo_list_app/config/configuration_result.dart';
+import 'package:todo_list_app/pages/auth/auth_view.dart';
+import 'package:todo_list_app/pages/home/home_view_controller.dart';
+import 'package:todo_list_app/pages/widgets/checkauth.dart';
+import 'package:todo_list_app/repositories/auth_repository.dart';
 
-void main() {
-  Configuration config = Configuration.local([Item.schema]);
-  Realm realm = Realm(config);
-  ItemModel itemModel = ItemModel(realm: realm);
-  ItemService itemService = ItemService(itemModel);
+void main() async {
+  ConfigurationResult configurationResult = await ConfigHelper.config();
 
-  runApp(
-    AppWidget(
-      home: const HomePage(),
-      itemService: itemService,
+  runApp(ChangeNotifierProvider(
+    create: (context) => AuthRepository(),
+    child: CheckAuth(
+      home: HomeViewController(itemModel: configurationResult.itemModel),
+      auth: const AuthView(),
     ),
-  );
+  ));
 }

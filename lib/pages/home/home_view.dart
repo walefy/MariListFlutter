@@ -1,67 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:realm/realm.dart';
+import 'package:todo_list_app/entities/item.dart';
 import 'package:todo_list_app/pages/widgets/add_item_button.dart';
 import 'package:todo_list_app/pages/widgets/item_input.dart';
-import 'package:todo_list_app/pages/widgets/item_tile.dart';
 import 'package:todo_list_app/pages/widgets/items_list.dart';
-import 'package:todo_list_app/services/item_service.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HomeView extends StatelessWidget {
+  final GlobalKey<AnimatedListState> listKey;
+  final List<Item> items;
+  final TextEditingController itemInputController;
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
+  final void Function(ObjectId id, bool state) toggleItemCompleted;
+  final void Function(ObjectId id) removeItem;
+  final void Function() addItem;
 
-class _HomePageState extends State<HomePage> {
-  late final TextEditingController _addItemInputController;
-  final GlobalKey<AnimatedListState> _listKey = GlobalKey();
-  late ItemService itemService;
-
-  @override
-  void initState() {
-    _addItemInputController = TextEditingController();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _addItemInputController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    itemService = Provider.of<ItemService>(context);
-  }
-
-  void _addItem() {
-    if (_addItemInputController.text.isEmpty) return;
-
-    itemService.addItem(_addItemInputController.text);
-    _addItemInputController.clear();
-    _listKey.currentState!.insertItem(itemService.items.length - 1);
-  }
-
-  void _removeItem(ObjectId id) {
-    Map<String, dynamic> result = itemService.removeItem(id);
-
-    _listKey.currentState!.removeItem(
-      result['index'],
-      (BuildContext context, Animation<double> animation) => ItemTile(
-        item: result['item'],
-        animation: animation,
-        removeItem: (_) {},
-        toggleItemCompleted: (_, __) {},
-      ),
-    );
-  }
-
-  void _toggleItemCompleted(ObjectId id, bool state) {
-    itemService.toggleItemCompleted(id, state);
-  }
+  const HomeView({
+    super.key,
+    required this.toggleItemCompleted,
+    required this.removeItem,
+    required this.addItem,
+    required this.listKey,
+    required this.items,
+    required this.itemInputController,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -72,10 +33,10 @@ class _HomePageState extends State<HomePage> {
           children: [
             Expanded(
               child: AnimatedItemList(
-                listKey: _listKey,
-                items: itemService.items,
-                toggleItemCompleted: _toggleItemCompleted,
-                removeItem: _removeItem,
+                listKey: listKey,
+                items: items,
+                toggleItemCompleted: toggleItemCompleted,
+                removeItem: removeItem,
               ),
             ),
             Container(
@@ -85,10 +46,10 @@ class _HomePageState extends State<HomePage> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: ItemInput(controller: _addItemInputController),
+                      child: ItemInput(controller: itemInputController),
                     ),
                     const SizedBox(width: 10),
-                    AddItemButton(onPress: _addItem),
+                    AddItemButton(onPress: addItem),
                   ],
                 ),
               ),
